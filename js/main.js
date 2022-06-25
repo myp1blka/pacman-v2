@@ -118,8 +118,9 @@ const createCreatures = () => {
             creX = randXY(0, playFieldWidth, CreatureWidth);
             creY = randXY(0, playFieldHeight, CreatureHeight);
             //console.log('Generate:  x = ' + creX + ' y = ' + creY);
-            extremalExit -= 1; if (extremalExit=0){return}
-        }while (collisionCheckFunction (creX, creY) != -1)
+            extremalExit -= 1; console.log('extremalExit ' + extremalExit); if (extremalExit===0){break}
+        } while ((collisionCheckFunction(creX, creY) != -1) || (extremalExit=0))
+        
         creaturesArr[i].push (creX);
         creaturesArr[i].push(creY);
         
