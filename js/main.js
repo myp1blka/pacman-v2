@@ -51,14 +51,16 @@ const StartGameFunction = (e) => {
 
 const drawPlayingFieldFunction = () => {
     
-    let ResultHTML = '';
-        elMainBlock.innerHTML = '';
+    let ResultHTML = ''; // очистити накопичувальну змінну
+        elMainBlock.innerHTML = ''; // очистити основний блок дів
         elMainBlock.insertAdjacentHTML('beforeend', ' Let\'s Play ' + playFieldWidth + 'x' + playFieldHeight);
+
+    // Малюємо ігрове поле
         elMainBlock.insertAdjacentHTML('beforeend',
             `    <div class="playField" style="position: absolute; top:10px; left:200px;
             width: ${playFieldWidth}px; height: ${playFieldHeight}px;border:1px solid black;"></div>`);
         
-    // Отримуємо новостворений блок    
+    // Отримуємо новостворений блок ігрового поля   
         const elPlayFieldBlock = document.querySelector('.playField');
     
     // Наповнюємо живністю
@@ -82,6 +84,7 @@ const drawPlayingFieldFunction = () => {
             <img src="img/pacman.png" class="pacman-scin" alt="pac-man:${creaturesArr[0][1]}x${creaturesArr[0][1]}" width="100%">
         </div>`;
 
+    // Вставляємо наші художності в основний блок
     elPlayFieldBlock.insertAdjacentHTML('beforeend', ResultHTML);
        
 }
@@ -89,53 +92,56 @@ const drawPlayingFieldFunction = () => {
 //   --------------------------------------------------------------////////////////////-----------------------------------------
 
 const createCreatures = () => {
-    creaturesArr.length = [];
-    console.log('CREATE numberOfMonsters: ' + numberOfMonsters);
+    creaturesArr.length = []; // Очистимо масив з живністю
     // Масив [i] [x, y]
     // 0 - пакман, i - монстри, numberOfMonsters+1 - мітка фінішу 
 
     for (let i = 0; i <= (numberOfMonsters + 1); i++) {
-        creaturesArr.push(new Array());
+        creaturesArr.push(new Array()); // Додаємо масив(x,y) в масив
         let creX;
         let creY;
-        let extremalExit=5;
+        let extremalExit=10; // скільки невдач порахувати перед аварійним завершенням, щоб не було зацикленості
+
         do
         {
-            creX = randXY(0, playFieldWidth, CreatureWidth);
-            creY = randXY(0, playFieldHeight, CreatureHeight);
-            extremalExit -= 1; console.log('extremalExit ' + extremalExit); if (extremalExit===0){break}
+            creX = randXY(0, playFieldWidth, CreatureWidth); // рандомній X  (від, до, кратно чому)
+            creY = randXY(0, playFieldHeight, CreatureHeight); // рандомній Y  (від, до, кратно чому)
+
+            // Аварійний вихід про всяк випадок
+            extremalExit -= 1; if (extremalExit===0){break}
+
         } while ((collisionCheckFunction(creX, creY) != -1) || (extremalExit=0))
         
-        creaturesArr[i].push (creX);
-        creaturesArr[i].push(creY);
+        creaturesArr[i].push (creX); // Додаємо X координату істоти
+        creaturesArr[i].push (creY); // Додаємо Y координату істоти
         
         console.log('CREATE Creature ' + i + ' [ x = ' + creaturesArr[i][0] + ' y = ' + creaturesArr[i][1] + ' ] ');
         
     }
-
-    console.log('CREATE creaturesArr[0] ' + creaturesArr[0]);
-    console.log('CREATE creaturesArr.length ' + creaturesArr.length);
 }
 
 
 //   --------------------------------------------------------------////////////////////-----------------------------------------
 
 const collisionCheckFunction = (x, y) => {
-    if (x >= 0 && y >= 0) {
-        let collisionDetected = -1;
+    // Якщо все добре, повертає '-1' , а якщо знаходить співпадіння, повертає номер з масиву з ким співпали координати
+    if (x >= 0 && y >= 0) // Чи нормальні цілі числа на вході
+    {
+        let collisionDetected = -1; // Оголошуєму змінну індикатор зіткнень
         if (
-            (x >= 0 && y >= 0) &&
-            (x <= (playFieldWidth - CreatureWidth) && y <= (playFieldHeight - CreatureHeight))
-        )
+            (x >= 0 && y >= 0) && // Чи не вилазимо за верхню або ліву грань
+            (x <= (playFieldWidth - CreatureWidth) && y <= (playFieldHeight - CreatureHeight)) // чи не вилазимо праву або нижню грань
+            )
         {
             for (let i = 0; i <= creaturesArr.length-1 ; i++) {
+                // Циклом перевіряємо координати всіх істот на предмет співпадіння
                 if (x === (creaturesArr[i][0]) && y === (creaturesArr[i][1]))
                 {
-                    collisionDetected = i;                    
+                    collisionDetected = i; // Якщо співпадіння було, записуємо у змінну номер в масиві з ким співпадіння
                 }
-                else {}
+                else {} // в іншому випадку все добре, нічого не робимо
             }
-            console.log("CHECK return i = " + collisionDetected);
+            // якщо було співпадіння, функція повертає номер співпадіння, якщо ні то '-1' типу все ОК
             if (collisionDetected > -1) { return collisionDetected } else  { return -1 }
         }
     }
@@ -144,24 +150,22 @@ const collisionCheckFunction = (x, y) => {
 //   --------------------------------------------------------------////////////////////-----------------------------------------
 
 const moveFunction = (moveDirection) => { 
-    //console.log(gameStarted);
-    //console.log('MOVE ' + moveDirection);
-    let checkColis;
-    if (gameStarted === 1) {
+    let checkColis; // сюди будем писати стан перешкоди
+    if (gameStarted === 1) {// якщо гра почалась, можемо рухатись
         //console.log(elPacManScin);
-        if (moveDirection === "moveUp") {
+        if (moveDirection === "moveUp") {       // Перевірити чи не на перешкоди ми збираємось рухатись
             checkColis = collisionCheckFunction(creaturesArr[0][0], creaturesArr[0][1] - PacManHeight)
-            PacManScin = 'rotate(270deg)';
-            if (checkColis === numberOfMonsters+1){
+            PacManScin = 'rotate(270deg)'; // Повертати ПакМана туди куди він прямує
+            if (checkColis === numberOfMonsters+1){ // Потрапили на клітку фініш
                 console.log("!!!!!!!!!!!!!!!!!!!!!   YOU WIN   !!!!!!!!!!!!!!!!!!!!!");
                 alert('YOU WIN !!!');
             }
-            if (checkColis === -1 || checkColis === numberOfMonsters+1)
-                {creaturesArr[0][1] -= PacManHeight}
-            else if (checkColis != numberOfMonsters+1){
-                //console.log('cx= ' + creaturesArr[checkColis][0] + ' cy' + creaturesArr[checkColis][1] - PacManHeight)
-                if (collisionCheckFunction(creaturesArr[checkColis][0], creaturesArr[checkColis][1] - PacManHeight) === -1)
-                {
+            if (checkColis === -1 || checkColis === numberOfMonsters+1)// якщо перешкод немає, або це мітка фініш, рухаємось
+                {creaturesArr[0][1] -= PacManHeight} // Рухаємо ПакМана
+            else if (checkColis != numberOfMonsters+1) // перевіримо чи не з фінішем ми зіткнулися
+            {       //  Перевіримо чи можна здвинути перешкоду на шляху у ПакМана
+                    if (collisionCheckFunction(creaturesArr[checkColis][0], creaturesArr[checkColis][1] - PacManHeight) === -1)
+                {   // Якщо все добре, здвигаємо перешкоду і заразом і ПакМана
                     creaturesArr[checkColis][1] -= PacManHeight;
                     creaturesArr[0][1] -= PacManHeight;
                 }
@@ -176,7 +180,8 @@ const moveFunction = (moveDirection) => {
             }
             if (checkColis === -1 || checkColis === numberOfMonsters+1)
                 {creaturesArr[0][0] -= PacManWidth}
-            else if (checkColis != numberOfMonsters+1) {
+            else if (checkColis != numberOfMonsters+1) 
+            {
                 if (collisionCheckFunction(creaturesArr[checkColis][0] - PacManWidth, creaturesArr[checkColis][1]) === -1)
                 {
                     creaturesArr[checkColis][0] -= PacManWidth;
@@ -193,7 +198,8 @@ const moveFunction = (moveDirection) => {
             }
             if (checkColis === -1 || checkColis === numberOfMonsters+1)
                 {creaturesArr[0][1] += PacManHeight}
-            else if (checkColis != numberOfMonsters+1) {
+            else if (checkColis != numberOfMonsters+1) 
+            {
                 if (collisionCheckFunction(creaturesArr[checkColis][0], creaturesArr[checkColis][1] + PacManHeight) === -1)
                 {
                     creaturesArr[checkColis][1] += PacManHeight;
@@ -210,7 +216,8 @@ const moveFunction = (moveDirection) => {
             }
             if (checkColis === -1 || checkColis === numberOfMonsters+1)
                 {creaturesArr[0][0] += PacManWidth}
-            else if (checkColis != numberOfMonsters+1) {
+            else if (checkColis != numberOfMonsters+1) 
+            {
                 if (collisionCheckFunction(creaturesArr[checkColis][0] + PacManWidth, creaturesArr[checkColis][1])=== -1)
                 {
                     creaturesArr[checkColis][0] += PacManWidth;
@@ -219,13 +226,13 @@ const moveFunction = (moveDirection) => {
             }
         }
         drawPlayingFieldFunction();
-        console.log(moveDirection + " position of PacMan [" + creaturesArr[0][0] + ", " + creaturesArr[0][1] + "]");
+        console.log(moveDirection + "    PacMan position [" + creaturesArr[0][0] + ", " + creaturesArr[0][1] + "]");
     }
     else { console.log('Please start the game'); }
 }
 
 //   --------------------------------------------------------------////////////////////-----------------------------------------
-
+// Рандомна функція (від, до, кратна чому)
 const randXY = (min,max,num) => {
     return Math.floor(Math.floor(Math.random()*(max-min+1)+min) / num) * num;
 }
