@@ -64,14 +64,14 @@ const drawPlayingFieldFunction = () => {
 
         ResultHTML += `     <div class="red-block" style="position: absolute; top:${creaturesArr[0][1]}px; left: ${creaturesArr[0][0]}px; 
         width:${PacManWidth}px;height:${PacManHeight}px;border:0px solid red;">
-            <img src="img/pacman.png" class="pacman-scin" alt="pac-man" width="100%">
+            <img src="img/pacman.png" class="pacman-scin" alt="pac-man:${creaturesArr[0][1]}x${creaturesArr[0][1]}" width="100%">
         </div>`;
     
     
     for (let i = 1; i <= (numberOfMonsters); i++) {
         ResultHTML += `     <div class="grey-block-${i}" style="position: absolute; top:${creaturesArr[i][1]}px; left:${creaturesArr[i][0]}px; 
         width:${CreatureWidth}px;height:${CreatureHeight}px;border:0px solid red;">
-            <img src="img/Blinky1.png" alt="monster1" width="100%">
+            <img src="img/Blinky1.png" alt="monster1:${creaturesArr[i][1]}x${creaturesArr[i][1]}" width="100%">
         </div>`
     }
 
@@ -123,9 +123,9 @@ console.log('numberOfMonsters: ' + numberOfMonsters);
     }
     // console.log('-----------------------------');
     // console.log('creaturesArr[0][0] ' + creaturesArr[0][0]);
-    // console.log('creaturesArr[0] ' + creaturesArr[0]);
+     console.log('creaturesArr[0] ' + creaturesArr[0]);
     
-    // console.log('creaturesArr.length ' + creaturesArr.length);
+     console.log('creaturesArr.length ' + creaturesArr.length);
  
 
  
@@ -136,32 +136,38 @@ console.log('numberOfMonsters: ' + numberOfMonsters);
 //   --------------------------------------------------------------////////////////////-----------------------------------------
 
 const collisionCheckFunction = (x, y) => {
-    if (x && y) {
-        //console.log('creaturesArr.length = ' + creaturesArr.length)
+    if (x >= 0 && y >= 0) {
+        
         //console.log('x = ' + x + ' y = ' + y);
+        let collisionDetected = 0;
         if (
             (x >= 0 && y >= 0) &&
             (x <= (playFieldWidth - CreatureWidth) && y <= (playFieldHeight - CreatureHeight))
         )
         {
-            // for (let i = 1; i <= creaturesArr.length+1; i++) {
-            // console.log("creaturesArr.length: " + creaturesArr.length);
-            // console.log("x= " + x + " y= " + y + " creaturesArr[" + i + "][0]= " + creaturesArr[i][0] +
-            //     " creaturesArr[" + i + "][1]= " + creaturesArr[i][1]);
+            console.log('creaturesArr.length = ' + creaturesArr.length);
+            for (let i = 0; i <= creaturesArr.length-2 ; i++) {
+                console.log("x= " + x + " y= " + y + " creaturesArr[" + i + "][0]= " + creaturesArr[i][0] +
+                    " creaturesArr[" + i + "][1]= " + creaturesArr[i][1]);
 
-            // if ((x != (creaturesArr[i][1]) && y != (creaturesArr[i][0]))
-            //     console.log("Cheked return 0");
-                return 0;
-            
-            // else {
-            //     console.log("Cheked return i=" + i);
-            //     return i;
+                if (x === (creaturesArr[i][0]) && y === (creaturesArr[i][1]))
+                {
+                    collisionDetected = i;
+                    console.log("Cheked return i = " + i);
+                    
+                }
+                else {
+                    console.log("Cheked return 0");
+                }
             }
+            // if ((x === creaturesArr[numberOfMonsters + 1][0]) &&
+            //     (y === creaturesArr[numberOfMonsters + 1][1]))
+            //     {collisionDetected = 0}
+            if (collisionDetected > 0) { return collisionDetected } else  { return 0 }
+            console.log("Cheked");
         }
-        console.log("Cheked");
     }
-
-
+}
 
 //   --------------------------------------------------------------////////////////////-----------------------------------------
 
@@ -169,7 +175,7 @@ const moveFunction = (moveDirection) => {
     //console.log(gameStarted);
     //console.log('MOVE ' + moveDirection);
     if (gameStarted === 1) {
-        console.log(elPacManScin);
+        //console.log(elPacManScin);
         if (moveDirection === "moveUp") {
             elPacManScin.style.transform = "rotate(270deg)";
             if (collisionCheckFunction(creaturesArr[0][0], creaturesArr[0][1] - PacManHeight) === 0)
