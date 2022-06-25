@@ -22,7 +22,8 @@ const CreatureHeight = 100;
 const PacManWidth = CreatureWidth;
 const PacManHeight = CreatureHeight;
 
-let elPacManScin;
+var PacManScin='scaleX(1)';
+
 let PacManStepPx;
 let playFieldWidth;
 let playFieldHeight;
@@ -45,7 +46,7 @@ const StartGameFunction = (e) => {
     createCreatures();
     drawPlayingFieldFunction();
     gameStarted = 1;
-    console.log('New game Started')
+    console.log('New game Started ####################################################################################################')
 }
 
 //   --------------------------------------------------------------////////////////////-----------------------------------------
@@ -62,27 +63,31 @@ const drawPlayingFieldFunction = () => {
     // Отримуємо новостворений блок    
         const elPlayFieldBlock = document.querySelector('.playField');
 
-        ResultHTML += `     <div class="red-block" style="position: absolute; top:${creaturesArr[0][1]}px; left: ${creaturesArr[0][0]}px; 
-        width:${PacManWidth}px;height:${PacManHeight}px;border:0px solid red;">
-            <img src="img/pacman.png" class="pacman-scin" alt="pac-man:${creaturesArr[0][1]}x${creaturesArr[0][1]}" width="100%">
-        </div>`;
+
     
     
     for (let i = 1; i <= (numberOfMonsters); i++) {
         ResultHTML += `     <div class="grey-block-${i}" style="position: absolute; top:${creaturesArr[i][1]}px; left:${creaturesArr[i][0]}px; 
         width:${CreatureWidth}px;height:${CreatureHeight}px;border:0px solid red;">
-            <img src="img/Blinky1.png" alt="monster1:${creaturesArr[i][1]}x${creaturesArr[i][1]}" width="100%">
+            <img src="img/Blinky${ randXY(1, 2, 1) }.png" alt="monster${i}:${creaturesArr[i][0]}x${creaturesArr[i][1]}" width="100%">
         </div>`
     }
 
-    ResultHTML += `     <div class="green-block" style="position: absolute;
+        ResultHTML += `     <div class="green-block" style="position: absolute;
          top:${creaturesArr[numberOfMonsters + 1][1]}px; left: ${creaturesArr[numberOfMonsters + 1][0]}px;
         width:${CreatureWidth}px;height:${CreatureHeight}px;border:0px solid red;">
-            <img src="img/Blinky2.png" alt="monster1" width="100%">
+            <img src="img/kolo.png" alt="monster2" width="100%">
+        </div>`;
+    
+        ResultHTML += `     <div class="red-block" style="position: absolute; transform:${PacManScin}; top:${creaturesArr[0][1]}px; left: ${creaturesArr[0][0]}px; 
+        width:${PacManWidth}px;height:${PacManHeight}px;border:0px solid red;">
+            <img src="img/pacman.png" class="pacman-scin" alt="pac-man:${creaturesArr[0][1]}x${creaturesArr[0][1]}" width="100%">
         </div>`;
 
-        elPlayFieldBlock.insertAdjacentHTML('beforeend', ResultHTML);
-elPacManScin = document.querySelector('.pacman-scin');
+    elPlayFieldBlock.insertAdjacentHTML('beforeend', ResultHTML);
+    
+    elPacManScin = document.querySelector('.pacman-scin');
+   
     
     
        //ResultHTML += 123
@@ -92,7 +97,7 @@ elPacManScin = document.querySelector('.pacman-scin');
 
 const createCreatures = () => {
     creaturesArr.length = [];
-console.log('numberOfMonsters: ' + numberOfMonsters);
+    console.log('CREATE numberOfMonsters: ' + numberOfMonsters);
     // Масив
     // 0 0 пакман ширина
     // 0 1 пакман висота
@@ -101,31 +106,31 @@ console.log('numberOfMonsters: ' + numberOfMonsters);
     // -1 0 фініш ширина
     // -1 1 фініш висота
        
-    creaturesArr.push( new Array());
+    //creaturesArr.push( new Array());
 
     for (let i = 0; i <= (numberOfMonsters + 1); i++) {
         creaturesArr.push(new Array());
-        let colisResult = 1;
         let creX;
         let creY;
-        while ((colisResult) === 1)
+        let extremalExit=5;
+        do
         {
             creX = randXY(0, playFieldWidth, CreatureWidth);
             creY = randXY(0, playFieldHeight, CreatureHeight);
             //console.log('Generate:  x = ' + creX + ' y = ' + creY);
-            colisResult = collisionCheckFunction (creX, creY);
-        }
+            extremalExit -= 1; if (extremalExit=0){return}
+        }while (collisionCheckFunction (creX, creY) != -1)
         creaturesArr[i].push (creX);
         creaturesArr[i].push(creY);
         
-        console.log('Create Creature ' + i + ' [ x = ' + creaturesArr[i][0] + ' y = ' + creaturesArr[i][1] + ' ] ');
+        console.log('CREATE Creature ' + i + ' [ x = ' + creaturesArr[i][0] + ' y = ' + creaturesArr[i][1] + ' ] ');
         
     }
     // console.log('-----------------------------');
     // console.log('creaturesArr[0][0] ' + creaturesArr[0][0]);
-     console.log('creaturesArr[0] ' + creaturesArr[0]);
+     console.log('CREATE creaturesArr[0] ' + creaturesArr[0]);
     
-     console.log('creaturesArr.length ' + creaturesArr.length);
+     console.log('CREATE creaturesArr.length ' + creaturesArr.length);
  
 
  
@@ -139,61 +144,66 @@ const collisionCheckFunction = (x, y) => {
     if (x >= 0 && y >= 0) {
         
         //console.log('x = ' + x + ' y = ' + y);
-        let collisionDetected = 0;
+        let collisionDetected = -1;
         if (
             (x >= 0 && y >= 0) &&
             (x <= (playFieldWidth - CreatureWidth) && y <= (playFieldHeight - CreatureHeight))
         )
         {
-            console.log('creaturesArr.length = ' + creaturesArr.length);
-            for (let i = 0; i <= creaturesArr.length-2 ; i++) {
-                console.log("x= " + x + " y= " + y + " creaturesArr[" + i + "][0]= " + creaturesArr[i][0] +
+            console.log('CHECK creaturesArr.length = ' + creaturesArr.length);
+            console.log("CHECK x= " + x + " y= " + y)
+            for (let i = 0; i <= creaturesArr.length-1 ; i++) {
+                console.log("CHECK creaturesArr[" + i + "][0]= " + creaturesArr[i][0] +
                     " creaturesArr[" + i + "][1]= " + creaturesArr[i][1]);
 
                 if (x === (creaturesArr[i][0]) && y === (creaturesArr[i][1]))
                 {
-                    collisionDetected = i;
-                    console.log("Cheked return i = " + i);
-                    
+                    collisionDetected = i;                    
                 }
-                else {
-                    console.log("Cheked return 0");
-                }
+                else {}
             }
-            // if ((x === creaturesArr[numberOfMonsters + 1][0]) &&
-            //     (y === creaturesArr[numberOfMonsters + 1][1]))
-            //     {collisionDetected = 0}
-            if (collisionDetected > 0) { return collisionDetected } else  { return 0 }
-            console.log("Cheked");
+            console.log("CHECK return i = " + collisionDetected);
+            if (collisionDetected === numberOfMonsters+1){console.log("!!!!!!!!!!!!!!!!!!!!!   YOU WIN   !!!!!!!!!!!!!!!!!!!!!")}
+            if (collisionDetected > -1) { return collisionDetected } else  { return -1 }
         }
     }
 }
 
+
+// elPacManScin.style.transform = "rotate(270deg)";
+// elPacManScin.style.transform = "scaleX(-1)";
+// elPacManScin.style.transform = "rotate(90deg)";
+// elPacManScin.style.transform = "scaleX(1)";
 //   --------------------------------------------------------------////////////////////-----------------------------------------
 
 const moveFunction = (moveDirection) => { 
     //console.log(gameStarted);
     //console.log('MOVE ' + moveDirection);
+    let checkColis;
     if (gameStarted === 1) {
         //console.log(elPacManScin);
         if (moveDirection === "moveUp") {
-            elPacManScin.style.transform = "rotate(270deg)";
-            if (collisionCheckFunction(creaturesArr[0][0], creaturesArr[0][1] - PacManHeight) === 0)
+            checkColis = collisionCheckFunction(creaturesArr[0][0], creaturesArr[0][1] - PacManHeight)
+            PacManScin = 'rotate(270deg)';
+            if (checkColis === -1 || checkColis === numberOfMonsters+1)
                 {creaturesArr[0][1] -= PacManHeight};
         }
         if (moveDirection === "moveLeft") {
-            elPacManScin.style.transform = "scaleX(-1)";
-            if (collisionCheckFunction(creaturesArr[0][0] - PacManWidth, creaturesArr[0][1]) === 0)
+            checkColis = collisionCheckFunction(creaturesArr[0][0] - PacManWidth, creaturesArr[0][1])
+            PacManScin = 'scaleX(-1)';
+            if (checkColis === -1 || checkColis === numberOfMonsters+1)
                 {creaturesArr[0][0] -= PacManWidth};
         }
         if (moveDirection === "moveDown") {
-            elPacManScin.style.transform = "rotate(90deg)";
-            if (collisionCheckFunction(creaturesArr[0][0], creaturesArr[0][1] + PacManHeight) === 0)
+            checkColis = collisionCheckFunction(creaturesArr[0][0], creaturesArr[0][1] + PacManHeight)
+            PacManScin = 'rotate(90deg)';
+            if (checkColis === -1 || checkColis === numberOfMonsters+1)
                 {creaturesArr[0][1] += PacManHeight};
         }
         if (moveDirection === "moveRight") {
-            elPacManScin.style.transform = "scaleX(1)";
-            if (collisionCheckFunction(creaturesArr[0][0] + PacManWidth, creaturesArr[0][1]) === 0)
+            checkColis = collisionCheckFunction(creaturesArr[0][0] + PacManWidth, creaturesArr[0][1])
+            PacManScin = 'scaleX(1)';
+            if (checkColis === -1 || checkColis === numberOfMonsters+1)
                 {creaturesArr[0][0] += PacManWidth};
         }
         drawPlayingFieldFunction();
